@@ -14,30 +14,34 @@ class User:
         self.vk_token = vk_token
         self.Ya_token = Ya_token
 
-    with open('vk_token.txt', 'r') as file_object:
-        vk_token = file_object.read().strip()
-
     def get_users_photos(self, user_id):
         url = 'https://api.vk.com/method/photos.get'
 
         params = {
             'owner_id': user_id,
             'album_id': 'profile',
-            'access_token': vk_token,
+            'access_token': self.vk_token,
             'extended': 1,
             'v': '5.131'
         }
         res = (requests.get(url, params)).json()
+        with open('photos_list.json', 'w', encoding='utf-8') as f:
+            json.dump(res, f, ensure_ascii=False, indent=4)
+
         photos_info = res['response']['items']
         dict_for_upload = {}
         for photo_data in photos_info:
             file_name = str(photo_data['likes']['count']) + '.jpg'
+            print(file_name)
             file_link = photo_data['sizes'][-1]
+            print (file_link)
             if file_name in dict_for_upload.keys():
-                file_name_new = file_name + '_' + str(photo_data['date'])
-                dict_for_upload[file_name_new] = dict_for_upload.pop(file_name)
+                file_name_new = str(photo_data['likes']['count']) + '_' + str(photo_data['date']) + '.jpg'
+                dict_for_upload[file_name_new] = file_link['url']
             else:
-                dict_for_upload[file_name] = file_link
+                dict_for_upload[file_name] = file_link['url']
+            print(dict_for_upload)
+
         with open('photo_list_upload.json', 'w', encoding='utf-8') as f:
             json.dump(dict_for_upload, f, ensure_ascii=False, indent=4)
         return dict_for_upload
@@ -53,8 +57,8 @@ class User:
         with open("photo_list_upload.json") as f:
             data = json.load(f)
         for file_name, file_path in data.items():
-            path_to_disk = Path("Backup_photo_from_vk/", file_name)
-            url_for_load = file_path['url']
+            path_to_disk = str("Backup_photo_from_vk/") + file_name
+            url_for_load = file_path
             url = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
             headers = self.get_headers()
             params = {
@@ -68,7 +72,8 @@ class User:
             status = requests.get(upload_url, headers=headers)
             pprint(status.json())
 
-            return status.json()
+
+
 
     #         if response.status_code == 202:
     #         print("Загрузка успешна")
@@ -81,6 +86,7 @@ class User:
     # #     status = requests.get(upload_url, headers=headers)
     # #     pprint(status.json())
     # #     return status.json()
+
 
 begemot_korovin = User(vk_token, Ya_token)
 begemot_korovin.get_users_photos(552934290)
