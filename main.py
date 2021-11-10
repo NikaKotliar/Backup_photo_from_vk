@@ -46,31 +46,51 @@ class User:
             json.dump(dict_for_upload, f, ensure_ascii=False, indent=4)
         return dict_for_upload
 
-    def get_headers(self):
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': 'OAuth {}'.format(self.Ya_token),
-            'Accept': 'application/json'
+    def upload_photo_to_disk (self):
+        headers = {"Authorization": "Bearer ### access token ###"}
+        para = {
+            "name": "##yourfilepath####",
         }
+        files = {
+            'data': ('metadata', json.dumps(para), 'application/json; charset=UTF-8'),
+            'file': open("./sample.png", "rb")
+        }
+        r = requests.post(
+            "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+            headers=headers,
+            files=files
+        )
 
-    def upload_users_photo(self):
-        with open("photo_list_upload.json") as f:
-            data = json.load(f)
-        for file_name, file_path in data.items():
-            path_to_disk = str("Backup_photo_from_vk/") + file_name
-            url_for_load = file_path
-            url = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
-            headers = self.get_headers()
-            params = {
-                "url": url_for_load,
-                "path": path_to_disk,
-                "disable_redirects": "true"
-            }
-            response = requests.post(url, headers=headers, params=params)
-            response.raise_for_status()
-            upload_url = (response.json()).get("href", "")
-            status = requests.get(upload_url, headers=headers)
-            pprint(status.json())
+
+
+
+
+
+    # def get_headers(self):
+    #     return {
+    #         'Content-Type': 'application/json',
+    #         'Authorization': 'OAuth {}'.format(self.Ya_token),
+    #         'Accept': 'application/json'
+    #     }
+    #
+    # def upload_users_photo(self):
+    #     with open("photo_list_upload.json") as f:
+    #         data = json.load(f)
+    #     for file_name, file_path in data.items():
+    #         path_to_disk = str("Backup_photo_from_vk/") + file_name
+    #         url_for_load = file_path
+    #         url = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
+    #         headers = self.get_headers()
+    #         params = {
+    #             "url": url_for_load,
+    #             "path": path_to_disk,
+    #             "disable_redirects": "true"
+    #         }
+    #         response = requests.post(url, headers=headers, params=params)
+    #         response.raise_for_status()
+    #         upload_url = (response.json()).get("href", "")
+    #         status = requests.get(upload_url, headers=headers)
+    #         pprint(status.json())
 
 
 
