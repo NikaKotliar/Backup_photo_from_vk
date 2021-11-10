@@ -3,11 +3,6 @@ from pprint import pprint
 import json
 from pathlib import Path
 
-with open('vk_token.txt', 'r') as file_object:
-    vk_token = file_object.read().strip()
-with open('Ya_token.txt', 'r') as file_object:
-    Ya_token = file_object.read().strip()
-
 
 class User:
     def __init__(self, vk_token, Ya_token):
@@ -34,7 +29,7 @@ class User:
             file_name = str(photo_data['likes']['count']) + '.jpg'
             print(file_name)
             file_link = photo_data['sizes'][-1]
-            print (file_link)
+            print(file_link)
             if file_name in dict_for_upload.keys():
                 file_name_new = str(photo_data['likes']['count']) + '_' + str(photo_data['date']) + '.jpg'
                 dict_for_upload[file_name_new] = file_link['url']
@@ -71,23 +66,30 @@ class User:
             upload_url = (response.json()).get("href", "")
             status = requests.get(upload_url, headers=headers)
             pprint(status.json())
+        print('Загрузка успешно завершена')
 
 
+my_file = Path('vk_token.txt')
+my_file_2 = Path('Ya_token.txt')
+if my_file.is_file() and my_file_2.is_file() :
+    with open('vk_token.txt', 'r') as file_object:
+        vk_token = file_object.read().strip()
+    with open('Ya_token.txt', 'r') as file_object:
+        Ya_token = file_object.read().strip()
 
+    print ('Добрый день! /n Если вы желаете скачать фото из профил вк на Яндекс диск, наберите "Да" ')
+    getting_agreement = input().islower()
+    if getting_agreement == 'lf' or 'да':
+        Vk_id = int(input('Введите ID VK профиля для скачивания фото: '))
+        begemot_korovin = User(vk_token, Ya_token)
+        try:
+            begemot_korovin.get_users_photos(Vk_id)
+            begemot_korovin.upload_users_photo()
+        except KeyError as e:
+            print('Возникла ошибка, проверьте правильность токенов доступа')
 
-    #         if response.status_code == 202:
-    #         print("Загрузка успешна")
-    #         # pprint(response.json())
-    #         return response.json()
-    #
-    # # def get_load_info(self):
-    # #     upload_url = self.upload_users_photo().get("href", "")
-    # #     headers = self.get_headers()
-    # #     status = requests.get(upload_url, headers=headers)
-    # #     pprint(status.json())
-    # #     return status.json()
-
-
-begemot_korovin = User(vk_token, Ya_token)
-begemot_korovin.get_users_photos(552934290)
-begemot_korovin.upload_users_photo()
+    else:
+        print ('До свидания')
+        exit()
+else:
+    print(f'Создайте 2 отдельных файла в формате .txt с именами {my_file} и {my_file_2} в корневой папке проекта')
