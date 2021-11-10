@@ -7,12 +7,15 @@ with open('vk_token.txt', 'r') as file_object:
     vk_token = file_object.read().strip()
 with open('Ya_token.txt', 'r') as file_object:
     Ya_token = file_object.read().strip()
+with open('G_drive_token.txt', 'r') as file_object:
+    G_drive_token = file_object.readline().strip()
 
 
 class User:
-    def __init__(self, vk_token, Ya_token):
+    def __init__(self, vk_token, Ya_token, G_drive_token):
         self.vk_token = vk_token
         self.Ya_token = Ya_token
+        self.G_drive_token = G_drive_token
 
     def get_users_photos(self, user_id):
         url = 'https://api.vk.com/method/photos.get'
@@ -46,20 +49,27 @@ class User:
             json.dump(dict_for_upload, f, ensure_ascii=False, indent=4)
         return dict_for_upload
 
-    def upload_photo_to_disk (self):
-        headers = {"Authorization": "Bearer ### access token ###"}
+    def upload_photo_to_Gdisk (self):
+        url = 'https://www.googleapis.com/upload/drive/v3/files'
+        headers = {
+            "Authorization": 'Bearer {}'.format(self.G_drive_token),
+            "Content-type" : 'application/json; charset=UTF-8'
+        }
+        print(headers)
+
         para = {
-            "name": "##yourfilepath####",
+            "name": "test_image.jpg",
         }
         files = {
             'data': ('metadata', json.dumps(para), 'application/json; charset=UTF-8'),
-            'file': open("./sample.png", "rb")
+            'file': open("./test_image.jpg", "rb")
         }
         r = requests.post(
             "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
             headers=headers,
             files=files
         )
+        print(r.text)
 
 
 
@@ -106,8 +116,9 @@ class User:
     # #     status = requests.get(upload_url, headers=headers)
     # #     pprint(status.json())
     # #     return status.json()
-
-
-begemot_korovin = User(vk_token, Ya_token)
-begemot_korovin.get_users_photos(552934290)
-begemot_korovin.upload_users_photo()
+#
+#
+begemot_korovin = User(vk_token, Ya_token,G_drive_token)
+begemot_korovin.upload_photo_to_Gdisk()
+# begemot_korovin.get_users_photos(552934290)
+# begemot_korovin.upload_users_photo()
