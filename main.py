@@ -48,14 +48,18 @@ class User:
             'Accept': 'application/json'
         }
 
-
     def create_file_for_photo(self, folder_name):
         params = {
-            "path" : folder_name
+            "path": folder_name
         }
-        respond = requests.put('https://cloud-api.yandex.net/v1/disk/resources', headers=self.get_headers(), params=params)
+        respond = requests.put(
+            'https://cloud-api.yandex.net/v1/disk/resources',
+            headers=self.get_headers(),
+            params=params
+        )
+        return respond
 
-    def upload_users_photo(self,folder_name):
+    def upload_users_photo(self, folder_name):
         with open("photo_list_upload.json") as f:
             data = json.load(f)
         for file_name, file_path in data.items():
@@ -76,34 +80,30 @@ class User:
         print('Загрузка успешно завершена')
 
 
-my_file = Path('vk_token.txt')
-my_file_2 = Path('Ya_token.txt')
-if my_file.is_file() and my_file_2.is_file() :
-    with open('vk_token.txt', 'r') as file_object:
-        vk_token = file_object.read().strip()
-    with open('Ya_token.txt', 'r') as file_object:
-        Ya_token = file_object.read().strip()
-#
-# begemot_korovin = User(vk_token, Ya_token)
-# begemot_korovin.get_users_photos(552934290)
-# begemot_korovin.create_file_for_photo(folder_name)
-# begemot_korovin.upload_users_photo(folder_name)
-
-    print ('Добрый день! /n Если вы желаете скачать фото из профил вк на Яндекс диск, наберите "Да" ')
-    getting_agreement = input().islower()
-    if getting_agreement == 'lf' or 'да':
-        Vk_id = int(input('Введите ID VK профиля для скачивания фото: '))
-        folder_name = str(input('Введите имя папки для сохранения фото'))
+if __name__ == '__main__':
+    my_file = Path('vk_token.txt')
+    my_file_2 = Path('Ya_token.txt')
+    if my_file.is_file() and my_file_2.is_file():
+        with open('vk_token.txt', 'r') as file_object:
+            vk_token = file_object.read().strip()
+        with open('Ya_token.txt', 'r') as file_object:
+            Ya_token = file_object.read().strip()
         begemot_korovin = User(vk_token, Ya_token)
-        try:
-            begemot_korovin.get_users_photos(Vk_id)
-            begemot_korovin.create_file_for_photo(folder_name)
-            begemot_korovin.upload_users_photo(folder_name)
-        except KeyError as e:
-            print('Возникла ошибка, проверьте правильность токенов доступа')
+        print('Добрый день! /n Если вы желаете скачать фото из профил вк на Яндекс диск, наберите "Да" ')
+        getting_agreement = input().islower()
+        if getting_agreement == 'lf' or 'да':
+            Vk_id = int(input('Введите ID VK профиля для скачивания фото: '))
+            folder_name = str(input('Введите имя папки для сохранения фото'))
+            begemot_korovin = User(vk_token, Ya_token)
+            try:
+                begemot_korovin.get_users_photos(Vk_id)
+                begemot_korovin.create_file_for_photo(folder_name)
+                begemot_korovin.upload_users_photo(folder_name)
+            except KeyError as e:
+                print('Возникла ошибка, проверьте правильность токенов доступа')
 
+        else:
+            print('До свидания')
+            exit()
     else:
-        print ('До свидания')
-        exit()
-else:
-    print(f'Создайте 2 отдельных файла в формате .txt с именами {my_file} и {my_file_2} в корневой папке проекта')
+        print(f'Создайте 2 отдельных файла в формате .txt с именами {my_file} и {my_file_2} в корневой папке проекта')

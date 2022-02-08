@@ -1,0 +1,8 @@
+vk_token.txt
+Ya_token.txt
+Insta_token.txt
+G_drive_token.txt
+*.json
+__pycache__
+*.jpg
+.idea
